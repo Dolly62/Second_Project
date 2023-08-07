@@ -1,4 +1,4 @@
-import React, { useContext, useReducer, useState } from "react";
+import React, { useContext, useReducer, useRef, useState } from "react";
 import AuthContext from "../../store/auth-context";
 import Card from "../UI/Card/Card";
 import classes from "./Login.module.css";
@@ -68,6 +68,10 @@ const Login = (props) => {
   const { isValid: passwordIsValid } = passwordState;
   const { isValid: collegeIsValid } = collegeNameState;
 
+  const emailInputRef = useRef();
+  const collegeInputRef = useRef();
+  const passwordInputRef = useRef();
+
   // useEffect(() => {
   //   const identifier = setTimeout(() => {
   //     console.log("Checking form validity!");
@@ -132,17 +136,29 @@ const Login = (props) => {
 
   const submitHandler = (event) => {
     event.preventDefault();
-    authCtx.onLogin(
-      emailState.value,
-      collegeNameState.value,
-      passwordState.value
-    );
+    if(formIsValid){
+      authCtx.onLogin(
+        emailState.value,
+        collegeNameState.value,
+        passwordState.value
+      );
+    }
+    else if (!emailIsValid){
+      emailInputRef.current.focus();
+    }
+    else if (!collegeIsValid){
+      collegeInputRef.current.focus();
+    }
+    else{
+      passwordInputRef.current.focus();
+    }
   };
 
   return (
     <Card className={classes.login}>
       <form onSubmit={submitHandler}>
         <Input
+          ref={emailInputRef}
           id="email"
           label="E-Mail"
           type="email"
@@ -152,6 +168,7 @@ const Login = (props) => {
           onBlur={validateEmailHandler}
         />
         <Input
+          ref={collegeInputRef}
           id="collegename"
           label="College Name"
           type="collegename"
@@ -161,6 +178,7 @@ const Login = (props) => {
           onBlur={validateCollegenameHandler}
         />
         <Input
+          ref={passwordInputRef}
           id="password"
           label="Password"
           type="password"
@@ -170,7 +188,7 @@ const Login = (props) => {
           onBlur={validatePasswordHandler}
         />
         <div className={classes.actions}>
-          <Button type="submit" className={classes.btn} disabled={!formIsValid}>
+          <Button type="submit" className={classes.btn}>
             Login
           </Button>
         </div>
